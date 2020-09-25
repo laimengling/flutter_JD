@@ -86,18 +86,80 @@ class _HomePageState extends State<HomePage> {
   // 热门推荐
   Widget _hotWidget() {
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey, width: 1),
-      ),
       width: double.infinity,
-      height: ScreenAdaper.height(200),
-      child: GridView.builder(
-          gridDelegate: null,
-          itemBuilder: null
+      padding: EdgeInsets.all(10),
+      child: Wrap(
+        runSpacing: 10,
+        spacing: 10,
+        children: <Widget>[
+          _recProductListWidget(),
+          _recProductListWidget(),
+          _recProductListWidget(),
+          _recProductListWidget(),
+        ],
       ),
     );
   }
 
+  _recProductListWidget() {
+    var width = (ScreenAdaper.getScreenWidth() - 17) ;
+    return Container(
+      width: ScreenAdaper.width(width),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black12, width: 1),
+      ),
+      padding: EdgeInsets.all(5),
+      child: Column(
+        children: <Widget>[
+          Container(
+            width: double.infinity,
+            child: AspectRatio( // 防止返回的图片高度不一
+              aspectRatio: 1/1,
+              child: Image.network("https://www.itying.com/images/flutter/list1.jpg",fit: BoxFit.fill),
+            )
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+            child: Text(
+                '2019夏季新款气质高贵洋气阔太太有女人味中长款宽松大码',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.black54)
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+            child: Stack(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '￥188.0',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 14
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                      '￥188.0',
+                    style: TextStyle(
+                      fontSize: 12,
+                      decoration: TextDecoration.lineThrough
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+
+
+        ],
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     // 不同设备适配问题
@@ -110,7 +172,7 @@ class _HomePageState extends State<HomePage> {
         _likeWidget(),
         _titleWidget('热门推荐'),
         SizedBox(height: ScreenAdaper.height(20)),
-
+        _hotWidget(),
       ],
     );
   }
