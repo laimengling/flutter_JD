@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:dio/dio.dart';
+import 'dart:convert';
 // 解决适配问题
 import '../../services/ScreenAdaper.dart';
+import '../../model/FocusModel.dart';
+import '../../model/ProductModel.dart';
+import '../../config/Config.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -9,28 +15,71 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  List _focusData = [];
+  List _likeData = [];
+  List _hotData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getFocusData();
+    _getHotData();
+    _getLikeData();
+  }
+  // 获取轮播数据
+  void _getFocusData() async{
+    var api = '${Config.domain}api/focus';
+    var result = await Dio().get(api);
+    var focusList = FocusModel.fromJson(result.data);
+    setState(() {
+      this._focusData = focusList.result;
+    });
+  }
+
+  // 猜你喜欢数据获取
+  void _getLikeData() async{
+    var api = '${Config.domain}api/plist?is_hot=1';
+    var result = await Dio().get(api);
+    var focusList = ProductModel.fromJson(result.data);
+    setState(() {
+      this._likeData = focusList.result;
+    });
+  }
+
+  // 热门推荐数据获取
+  void _getHotData() async{
+    var api = '${Config.domain}api/plist?is_best=1';
+    var result = await Dio().get(api);
+    var focusList = ProductModel.fromJson(result.data);
+    setState(() {
+      this._hotData = focusList.result;
+    });
+  }
+
+
   //轮播图
   Widget _swiperWidget() {
-    List<Map> imgList = [
-      {"url": "https://www.itying.com/images/flutter/slide01.jpg"},
-      {"url": "https://www.itying.com/images/flutter/slide02.jpg"},
-      {"url": "https://www.itying.com/images/flutter/slide03.jpg"},
-    ];
-    return Container(
-      child: AspectRatio(
-        aspectRatio: 2/1,
-        child:  Swiper(
-          itemBuilder: (BuildContext context,int index){
-            return Image.network(
-              imgList[index]['url'],
-              fit: BoxFit.fill,);
-          },
-          itemCount: 3,
-          pagination: new SwiperPagination(),
-          autoplay: true,
+    if (this._focusData.length != 0) {
+      return Container(
+        child: AspectRatio(
+          aspectRatio: 2/1,
+          child:  Swiper(
+            itemBuilder: (BuildContext context,int index){
+              var pic = this._focusData[index].pic;
+              pic = Config.domain+pic.replaceAll('\\', '/');
+              return Image.network(
+                pic,
+                fit: BoxFit.fill,);
+            },
+            itemCount: this._focusData.length,
+            pagination: new SwiperPagination(),
+            autoplay: true,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Text('数据为空');
+    }
   }
 
   // 标题
@@ -55,32 +104,43 @@ class _HomePageState extends State<HomePage> {
 
   // 猜你喜欢
   Widget _likeWidget() {
-    return Container(
-      width: double.infinity,
-      height: ScreenAdaper.height(240),
-      padding: EdgeInsets.all(ScreenAdaper.width(20)),
-      child: ListView.builder(
+    if (this._likeData.length != 0) {
+      return Container(
+        width: double.infinity,
+        height: ScreenAdaper.height(240),
+        padding: EdgeInsets.all(ScreenAdaper.width(20)),
+        child: ListView.builder(
           itemBuilder: (context, index) {
+            var pic = _likeData[index].sPic;
+            pic = Config.domain+pic.replaceAll('\\', '/');
             return Column(
               children: <Widget>[
                 Container(
                   width: ScreenAdaper.width(140),
                   height: ScreenAdaper.height(140),
                   margin: EdgeInsets.only(right: ScreenAdaper.width(5)),
-                  child: Image.network("https://www.itying.com/images/flutter/hot${index+1}.jpg",fit: BoxFit.cover),
+                  child: Image.network(pic,fit: BoxFit.cover),
                 ),
                 Container(
                   height: ScreenAdaper.height(45),
                   padding: EdgeInsets.only(top: ScreenAdaper.height(5)),
-                  child: Text("第${index}条"),
+                  child: Text(
+                    "￥${_likeData[index].price}",
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
                 )
               ],
             );
           },
-          itemCount: 10,
+          itemCount: _likeData.length,
           scrollDirection: Axis.horizontal,
-          ),
-    );
+        ),
+      );
+    } else {
+     return Text('数据为空');
+    }
   }
 
   // 热门推荐
@@ -91,18 +151,16 @@ class _HomePageState extends State<HomePage> {
       child: Wrap(
         runSpacing: 10,
         spacing: 10,
-        children: <Widget>[
-          _recProductListWidget(),
-          _recProductListWidget(),
-          _recProductListWidget(),
-          _recProductListWidget(),
-        ],
+        children: this._hotData.map<Widget>((element) {
+          return this._recProductListWidget(element);
+        }).toList(),
       ),
     );
   }
 
-  _recProductListWidget() {
+  _recProductListWidget(value) {
     var width = (ScreenAdaper.getScreenWidth() - 17) ;
+    var pic = Config.domain + value.pic.replaceAll('\\', '/');
     return Container(
       width: ScreenAdaper.width(width),
       decoration: BoxDecoration(
@@ -115,13 +173,13 @@ class _HomePageState extends State<HomePage> {
             width: double.infinity,
             child: AspectRatio( // 防止返回的图片高度不一
               aspectRatio: 1/1,
-              child: Image.network("https://www.itying.com/images/flutter/list1.jpg",fit: BoxFit.fill),
+              child: Image.network(pic,fit: BoxFit.fill),
             )
           ),
           Padding(
             padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
             child: Text(
-                '2019夏季新款气质高贵洋气阔太太有女人味中长款宽松大码',
+                value.title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: Colors.black54)
@@ -134,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    '￥188.0',
+                    '￥${value.price}',
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: 14
@@ -144,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                      '￥188.0',
+                      '￥${value.oldPrice}',
                     style: TextStyle(
                       fontSize: 12,
                       decoration: TextDecoration.lineThrough
@@ -153,9 +211,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-          )
-
-
+          ),
         ],
       ),
     );
@@ -167,6 +223,7 @@ class _HomePageState extends State<HomePage> {
     return ListView(
       children: <Widget>[
         _swiperWidget(),
+        SizedBox(height: ScreenAdaper.height(20)),
         _titleWidget('猜你喜欢'),
         SizedBox(height: ScreenAdaper.height(20)),
         _likeWidget(),
@@ -176,4 +233,5 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+
 }
