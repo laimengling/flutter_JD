@@ -16,6 +16,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
+      home: Tabs(),
     );
   }
 }
