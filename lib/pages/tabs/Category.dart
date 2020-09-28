@@ -10,7 +10,7 @@ class CategoryPage extends StatefulWidget {
   _CategoryPageState createState() => _CategoryPageState();
 }
 
-class _CategoryPageState extends State<CategoryPage> {
+class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClientMixin{
   var _currentIndex = 0;
   List _cateData = [];
   List _rightData = [];
@@ -99,24 +99,28 @@ class _CategoryPageState extends State<CategoryPage> {
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
               ),
-              itemCount: 18,
+              itemCount: this._rightData.length,
               itemBuilder: (context, index) {
-                var pic = this._cateData[0].pic;
+                var pic = this._rightData[index].pic;
                 pic = Config.domain + pic.replaceAll('\\','/');
-
-                return Container(
-                  child: Column(
-                    children: <Widget>[
-                      AspectRatio(
-                        aspectRatio: 1/1,
-                        child: Image.network(pic, fit: BoxFit.cover),
-                      ),
-                      Container(
-                        height: ScreenAdaper.height(40),
-                        child: Text('女装'),
-                      )
-                    ],
+                return InkWell(
+                  child: Container(
+                    child: Column(
+                      children: <Widget>[
+                        AspectRatio(
+                          aspectRatio: 1/1,
+                          child: Image.network(pic, fit: BoxFit.cover),
+                        ),
+                        Container(
+                          height: ScreenAdaper.height(40),
+                          child: Text('女装'),
+                        )
+                      ],
+                    ),
                   ),
+                  onTap: (){
+                    Navigator.pushNamed(context, '/productList', arguments: {'pid': this._rightData[index].sId});
+                  },
                 );
               }
           ),
@@ -153,4 +157,8 @@ class _CategoryPageState extends State<CategoryPage> {
       ],
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

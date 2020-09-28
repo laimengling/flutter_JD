@@ -1,15 +1,12 @@
-
-import 'dart:js';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_jdshop/pages/tabs/Cart.dart';
-import 'package:flutter_jdshop/pages/tabs/Category.dart';
-import 'package:flutter_jdshop/pages/tabs/Home.dart';
-import 'package:flutter_jdshop/pages/tabs/Tab.dart';
-import 'package:flutter_jdshop/pages/tabs/User.dart';
+import '../pages/ProductList.dart';
+import '../pages/Search.dart';
+import '../pages/tabs/Tab.dart';
 // 配置路由
 final routes = {
   '/':(context) => Tabs(),
+  '/search':(context) => SearchPage(),
+  '/productList':(context, { arguments }) => ProductList(arguments: arguments)
   /*
   '/product': (context) => ProductPage(),
   '/productInfo': (context, { arguments }) => ProductInfoPage(arguments: arguments),

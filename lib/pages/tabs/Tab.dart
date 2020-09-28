@@ -13,7 +13,10 @@ class _TabsState extends State<Tabs> {
 
   int _currentIndex  = 1;
 
-  List _pageList = [
+  // 创建页面控制器
+  var _pageController;
+
+  List<Widget> _pageList = [
     HomePage(),
     CategoryPage(),
     CartPage(),
@@ -21,17 +24,33 @@ class _TabsState extends State<Tabs> {
   ];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // 页面控制器初始化
+    this._pageController = new PageController(initialPage: _currentIndex);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('jdshop'),
       ),
-      body: this._pageList[this._currentIndex],
+      body:PageView(
+        controller: _pageController,
+        children: this._pageList,
+        onPageChanged: (index){
+          _currentIndex = index;
+        },
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: this._currentIndex,
         onTap: (index){
           setState(() {
-            this._currentIndex = index;
+//            this._currentIndex = index;
+            //页面控制器进行跳转
+              _pageController.jumpToPage(index);
           });
         },
         fixedColor: Colors.red,
