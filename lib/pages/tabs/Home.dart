@@ -44,6 +44,9 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
     setState(() {
       this._likeData = focusList.result;
     });
+    this._likeData.forEach((element) {
+      print(element);
+    });
   }
 
   // 热门推荐数据获取

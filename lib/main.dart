@@ -16,7 +16,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/productList',
+      initialRoute: '/',
       home: Tabs(),
       onGenerateRoute: onGenerateRoute,
       // 忘记写，会报错Could not find a generator for route RouteSettings，路由未拦截
