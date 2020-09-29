@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:dio/dio.dart';
-import 'dart:convert';
 // 解决适配问题
-import '../../services/ScreenAdaper.dart';
+import '../../services/ScreenAdapter.dart';
 import '../../model/FocusModel.dart';
 import '../../model/ProductModel.dart';
 import '../../config/Config.dart';
@@ -88,14 +87,14 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
   // 标题
   Widget _titleWidget(value) {
     return Container(
-      height: ScreenAdaper.height(45),
-      margin: EdgeInsets.only(left: ScreenAdaper.width(20)),
-      padding: EdgeInsets.only(left:ScreenAdaper.width(20)),
+      height: ScreenAdapter.height(45),
+      margin: EdgeInsets.only(left: ScreenAdapter.width(20)),
+      padding: EdgeInsets.only(left:ScreenAdapter.width(20)),
       decoration: BoxDecoration(
         border: Border(
          left:  BorderSide(
            color: Colors.red,
-           width: ScreenAdaper.width(5)
+           width: ScreenAdapter.width(5)
          )
         )
       ),
@@ -110,8 +109,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
     if (this._likeData.length != 0) {
       return Container(
         width: double.infinity,
-        height: ScreenAdaper.height(240),
-        padding: EdgeInsets.all(ScreenAdaper.width(20)),
+        height: ScreenAdapter.height(240),
+        padding: EdgeInsets.all(ScreenAdapter.width(20)),
         child: ListView.builder(
           itemBuilder: (context, index) {
             var pic = _likeData[index].sPic;
@@ -119,14 +118,14 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
             return Column(
               children: <Widget>[
                 Container(
-                  width: ScreenAdaper.width(140),
-                  height: ScreenAdaper.height(140),
-                  margin: EdgeInsets.only(right: ScreenAdaper.width(5)),
+                  width: ScreenAdapter.width(140),
+                  height: ScreenAdapter.height(140),
+                  margin: EdgeInsets.only(right: ScreenAdapter.width(5)),
                   child: Image.network(pic,fit: BoxFit.cover),
                 ),
                 Container(
-                  height: ScreenAdaper.height(45),
-                  padding: EdgeInsets.only(top: ScreenAdaper.height(5)),
+                  height: ScreenAdapter.height(45),
+                  padding: EdgeInsets.only(top: ScreenAdapter.height(5)),
                   child: Text(
                     "￥${_likeData[index].price}",
                     style: TextStyle(
@@ -162,10 +161,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
   }
 
   _recProductListWidget(value) {
-    var width = (ScreenAdaper.getScreenWidth() - 17) ;
+    var width = (ScreenAdapter.getScreenWidth() - 17) ;
     var pic = Config.domain + value.pic.replaceAll('\\', '/');
     return Container(
-      width: ScreenAdaper.width(width),
+      width: ScreenAdapter.width(width),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black12, width: 1),
       ),
@@ -180,7 +179,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
             )
           ),
           Padding(
-            padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+            padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
             child: Text(
                 value.title,
                 maxLines: 2,
@@ -189,7 +188,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+            padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
             child: Stack(
               children: <Widget>[
                 Align(
@@ -222,16 +221,16 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
   @override
   Widget build(BuildContext context) {
     // 不同设备适配问题
-    ScreenAdaper.init(context);
+    ScreenAdapter.init(context);
     return ListView(
       children: <Widget>[
         _swiperWidget(),
-        SizedBox(height: ScreenAdaper.height(20)),
+        SizedBox(height: ScreenAdapter.height(20)),
         _titleWidget('猜你喜欢'),
-        SizedBox(height: ScreenAdaper.height(20)),
+        SizedBox(height: ScreenAdapter.height(20)),
         _likeWidget(),
         _titleWidget('热门推荐'),
-        SizedBox(height: ScreenAdaper.height(20)),
+        SizedBox(height: ScreenAdapter.height(20)),
         _hotWidget(),
       ],
     );

@@ -3,6 +3,7 @@ import 'package:flutter_jdshop/pages/tabs/Cart.dart';
 import 'package:flutter_jdshop/pages/tabs/Category.dart';
 import 'package:flutter_jdshop/pages/tabs/Home.dart';
 import 'package:flutter_jdshop/pages/tabs/User.dart';
+import 'package:flutter_jdshop/services/ScreenAdapter.dart';
 
 class Tabs extends StatefulWidget {
   @override
@@ -34,15 +35,48 @@ class _TabsState extends State<Tabs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('jdshop'),
+      appBar: this._currentIndex != 3?AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.center_focus_weak, size: 28, color: Colors.black87),
+          onPressed: (){},
+        ),
+        title: InkWell(
+          child: Container(
+            height: ScreenAdapter.height(70),
+            decoration: BoxDecoration(
+                color: Color.fromRGBO(233, 233, 233, 0.8),
+                borderRadius: BorderRadius.circular(30)
+            ),
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.search),
+                Text('笔记本', style: TextStyle(fontSize: 14),)
+              ],
+            ),
+          ),
+          onTap: (){
+            Navigator.pushNamed(context, '/search');
+          },
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.message, size: 28, color: Colors.black87),
+            onPressed: null,
+          )
+        ],
+      ) : AppBar(
+        title: Text('用户中心'),
       ),
       body:PageView(
         controller: _pageController,
         children: this._pageList,
         onPageChanged: (index){
-          _currentIndex = index;
+          setState(() {
+            this._currentIndex = index;
+          });
         },
+//        physics: NeverScrollableScrollPhysics(), 静止页面，不能左右滑动
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: this._currentIndex,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
-import '../../services/ScreenAdaper.dart';
+import '../../services/ScreenAdapter.dart';
 import '../../model/CateModel.dart';
 import '../../config/Config.dart';
 
@@ -57,7 +57,7 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
                     child: Text('${this._cateData[index].title}',textAlign: TextAlign.center),
                     color: _currentIndex == index? Color.fromRGBO(240, 246, 246, 0.9):Colors.white,
                     width: double.infinity,
-                    height: ScreenAdaper.height(82),
+                    height: ScreenAdapter.height(82),
                     padding: EdgeInsets.all(8),
                   ),
                   onTap: (){
@@ -112,7 +112,7 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
                           child: Image.network(pic, fit: BoxFit.cover),
                         ),
                         Container(
-                          height: ScreenAdaper.height(40),
+                          height: ScreenAdapter.height(40),
                           child: Text('女装'),
                         )
                       ],
@@ -141,15 +141,15 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
   }
   @override
   Widget build(BuildContext context) {
-    ScreenAdaper.init(context);
+    ScreenAdapter.init(context);
 
-    var leftWidth = ScreenAdaper.getScreenWidth() / 4;
+    var leftWidth = ScreenAdapter.getScreenWidth() / 4;
 
     //右侧每一项宽度=（总宽度-左侧宽度-GridView外侧元素左右的Padding值-GridView中间的间距）/3
-    var rightItemWidth = (ScreenAdaper.getScreenWidth()-20-leftWidth-20) / 3;
-    rightItemWidth = ScreenAdaper.width(rightItemWidth);
+    var rightItemWidth = (ScreenAdapter.getScreenWidth()-20-leftWidth-20) / 3;
+    rightItemWidth = ScreenAdapter.width(rightItemWidth);
     //获取计算后的高度
-    var rightItemHeight=rightItemWidth+ScreenAdaper.height(28);
+    var rightItemHeight=rightItemWidth+ScreenAdapter.height(28);
     return Row(
       children: <Widget>[
         _leftCateWidget(leftWidth),
