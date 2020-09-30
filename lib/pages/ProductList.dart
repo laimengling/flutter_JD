@@ -212,7 +212,9 @@ class _ProductListState extends State<ProductList> {
         ),
       );
     } else {
-      return LoadingWidget();
+      return Center(
+        child: Text('无数据'),
+      );
     }
 
   }

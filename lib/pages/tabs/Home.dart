@@ -115,25 +115,32 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
           itemBuilder: (context, index) {
             var pic = _likeData[index].sPic;
             pic = Config.domain+pic.replaceAll('\\', '/');
-            return Column(
-              children: <Widget>[
-                Container(
-                  width: ScreenAdapter.width(140),
-                  height: ScreenAdapter.height(140),
-                  margin: EdgeInsets.only(right: ScreenAdapter.width(5)),
-                  child: Image.network(pic,fit: BoxFit.cover),
-                ),
-                Container(
-                  height: ScreenAdapter.height(45),
-                  padding: EdgeInsets.only(top: ScreenAdapter.height(5)),
-                  child: Text(
-                    "￥${_likeData[index].price}",
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
+            return InkWell(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    width: ScreenAdapter.width(140),
+                    height: ScreenAdapter.height(140),
+                    margin: EdgeInsets.only(right: ScreenAdapter.width(5)),
+                    child: Image.network(pic,fit: BoxFit.cover),
                   ),
-                )
-              ],
+                  Container(
+                    height: ScreenAdapter.height(45),
+                    padding: EdgeInsets.only(top: ScreenAdapter.height(5)),
+                    child: Text(
+                      "￥${_likeData[index].price}",
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              onTap: () {
+                Navigator.pushNamed(context, '/productContent',arguments: {
+                  'sId':_likeData[index].sId
+                });
+              }
             );
           },
           itemCount: _likeData.length,
@@ -163,59 +170,66 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
   _recProductListWidget(value) {
     var width = (ScreenAdapter.getScreenWidth() - 17) ;
     var pic = Config.domain + value.pic.replaceAll('\\', '/');
-    return Container(
-      width: ScreenAdapter.width(width),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black12, width: 1),
-      ),
-      padding: EdgeInsets.all(5),
-      child: Column(
-        children: <Widget>[
-          Container(
-            width: double.infinity,
-            child: AspectRatio( // 防止返回的图片高度不一
-              aspectRatio: 1/1,
-              child: Image.network(pic,fit: BoxFit.fill),
-            )
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
-            child: Text(
-                value.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.black54)
+    return InkWell(
+      child: Container(
+        width: ScreenAdapter.width(width),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black12, width: 1),
+        ),
+        padding: EdgeInsets.all(5),
+        child: Column(
+          children: <Widget>[
+            Container(
+                width: double.infinity,
+                child: AspectRatio( // 防止返回的图片高度不一
+                  aspectRatio: 1/1,
+                  child: Image.network(pic,fit: BoxFit.fill),
+                )
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
-            child: Stack(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '￥${value.price}',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 14
+            Padding(
+              padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
+              child: Text(
+                  value.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.black54)
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
+              child: Stack(
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '￥${value.price}',
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 14
+                      ),
                     ),
                   ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
                       '￥${value.oldPrice}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      decoration: TextDecoration.lineThrough
+                      style: TextStyle(
+                          fontSize: 12,
+                          decoration: TextDecoration.lineThrough
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      onTap: (){
+        Navigator.pushNamed(context, '/productContent',arguments: {
+          'sId':value.sId
+        });
+      },
     );
   }
   @override

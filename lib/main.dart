@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_jdshop/pages/tabs/Tab.dart';
+//import 'package:flutter_jdshop/pages/tabs/Tab.dart';
 import 'routes/Routes.dart';
 
 void main() {
@@ -16,8 +16,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/search',
-      home: Tabs(),
+      initialRoute: '/',
+//      home: Tabs(),
       theme: ThemeData(
         primaryColor: Colors.white
       ),
