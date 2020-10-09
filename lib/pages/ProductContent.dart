@@ -4,6 +4,8 @@ import 'package:flutter_jdshop/services/ScreenAdapter.dart';
 import 'ProductContent/ProductContentFirst.dart';
 import 'ProductContent/ProductContentSecond.dart';
 import 'ProductContent/ProductContentThree.dart';
+import '../services/EventBus.dart'; // 广播
+
 class ProductContentPage extends StatefulWidget {
   Map arguments;
   ProductContentPage ({Key key, this.arguments}): super(key: key);
@@ -118,6 +120,11 @@ class _ProductContentPageState extends State<ProductContentPage> {
                             margin: EdgeInsets.only(right: 20),
                             child: InkWell(
                               child: Text('加入购物车', style: TextStyle(color: Colors.white),),
+                              onTap: (){
+                                // 广播 这里有不合理的地方，如果她的attr是空的，在ProductContentFirst接收到广播仍然会弹出空白 Container
+                                // 改造 数据在ProductContent 查询，传到ProductContentFirst
+                                eventBus.fire(new ProductContentEvent('加入购物车'));
+                              },
                             )
                           ),
                           Container(
@@ -129,6 +136,9 @@ class _ProductContentPageState extends State<ProductContentPage> {
                               margin: EdgeInsets.only(right: 20),
                               child: InkWell(
                                 child: Text('立即购买', style: TextStyle(color: Colors.white),),
+                                onTap: (){
+                                  eventBus.fire(new ProductContentEvent('立即购买'));
+                                },
                               )
                           ),
                         ],

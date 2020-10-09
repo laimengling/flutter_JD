@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_jdshop/pages/Cart/CartNum.dart';
 import '../../config/Config.dart';
 import '../../pages/widget/JdButton.dart';
 import '../../services/ScreenAdapter.dart';
 import '../../model/ProductContentModel.dart';
 //import 'package:provider/provider.dart';
+import '../../services/EventBus.dart';
 
 class ProductContentFirst extends StatefulWidget {
   Map arguments;
@@ -19,11 +21,22 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
   List<Attr> _attr = [];
   ProductContentitem _pCItem;
   String _selectedValue;
-
+  var actionEventBus;
   @override
   void initState() {
     super.initState();
     this._getProductItem ();
+    // 监听广播
+    this.actionEventBus = eventBus.on<ProductContentEvent>().listen((event) {
+      print(event);
+      this._attrBottomSheet();
+    });
+  }
+
+  // 销毁
+  void dispose() {
+    super.dispose();
+    this.actionEventBus.cancel(); // 取消事件监听
   }
 
   _ProductContentFirstState(this._arguments);
@@ -67,36 +80,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
 
     }
   }
-// Container(
-//                  child: Wrap(
-//                  children: <Widget>[
-//                  InkWell(
-//                  child: Container(
-//                  padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-//                  margin: EdgeInsets.only(left: 10),
-//                  decoration: BoxDecoration(
-//                  color: Colors.red,
-//                  borderRadius: BorderRadius.circular(10)
-//                  ),
-//                  child: Text('红色', style: TextStyle(color: Colors.white),),
-//                  ),
-//                  ),
-//                  InkWell(
-//                  child: Container(
-//                  padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-//                  margin: EdgeInsets.only(left: 10),
-//                  decoration: BoxDecoration(
-//                  color: Colors.black12,
-//                  borderRadius: BorderRadius.circular(10)
-//                  ),
-//                  child: Text('黄色', style: TextStyle(color: Colors.black54),),
-//                  ),
-//                  ),
-//                  ],
-//                  ),
-//                  )
-  // 下拉框选项
-  // 更改属性
+
   _changeAttr(cate, title, setBottomState) {
     var attr = this._attr;
     for(var i = 0; i < attr.length; i++) {
@@ -195,7 +179,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
                                     children: <Widget>[
                                       Wrap(
                                         children: <Widget>[
-                                          _showBottomChoose(attrItem, setBottomState)
+                                          _showBottomChoose(attrItem, setBottomState),
                                         ],
                                       ),
                                       SizedBox(height: ScreenAdapter.height(10),),
@@ -203,8 +187,25 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
                                   ),
                                 );
                               }).toList(),
+                            ),
+                            Divider(),
+                            Container(
+                              child: Row(
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: Text('数量：'),
+                                  ),
+                                  Container(
+                                    child: Wrap(
+                                      children: <Widget>[
+                                        CartNum()
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                             )
-
                           ],
                         ),
                         Positioned(
