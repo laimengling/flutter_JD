@@ -8,7 +8,12 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+        appBar:   AppBar(
+        title: Text('用户中心'),
+      ),
+      body: Container()
+    );
   }
 
   @override

@@ -19,11 +19,11 @@ class _ProductContentPageState extends State<ProductContentPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print(arguments['sId']);
   }
 
   @override
   Widget build(BuildContext context) {
+    ScreenAdapter.init(context);
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -74,8 +74,8 @@ class _ProductContentPageState extends State<ProductContentPage> {
           children: <Widget>[
             TabBarView(
               children: <Widget>[
-                ProductContentFirst(),
-                ProductContentSecond(),
+                ProductContentFirst(arguments: arguments),
+                ProductContentSecond(arguments: arguments),
                 ProductContentThird()
               ],
             ),

@@ -36,39 +36,6 @@ class _TabsState extends State<Tabs> {
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
     return Scaffold(
-      appBar: this._currentIndex != 3?AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.center_focus_weak, size: 28, color: Colors.black87),
-          onPressed: (){},
-        ),
-        title: InkWell(
-          child: Container(
-            height: ScreenAdapter.height(70),
-            decoration: BoxDecoration(
-                color: Color.fromRGBO(233, 233, 233, 0.8),
-                borderRadius: BorderRadius.circular(30)
-            ),
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.search),
-                Text('笔记本', style: TextStyle(fontSize: 14),)
-              ],
-            ),
-          ),
-          onTap: (){
-            Navigator.pushNamed(context, '/search');
-          },
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.message, size: 28, color: Colors.black87),
-            onPressed: null,
-          )
-        ],
-      ) : AppBar(
-        title: Text('用户中心'),
-      ),
       body:PageView(
         controller: _pageController,
         children: this._pageList,

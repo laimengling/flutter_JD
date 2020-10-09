@@ -12,7 +12,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin{
 
   List _focusData = [];
   List _likeData = [];
@@ -236,17 +237,50 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin{
   Widget build(BuildContext context) {
     // 不同设备适配问题
     ScreenAdapter.init(context);
-    return ListView(
-      children: <Widget>[
-        _swiperWidget(),
-        SizedBox(height: ScreenAdapter.height(20)),
-        _titleWidget('猜你喜欢'),
-        SizedBox(height: ScreenAdapter.height(20)),
-        _likeWidget(),
-        _titleWidget('热门推荐'),
-        SizedBox(height: ScreenAdapter.height(20)),
-        _hotWidget(),
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.center_focus_weak, size: 28, color: Colors.black87),
+          onPressed: (){},
+        ),
+        title: InkWell(
+          child: Container(
+            height: ScreenAdapter.height(70),
+            decoration: BoxDecoration(
+                color: Color.fromRGBO(233, 233, 233, 0.8),
+                borderRadius: BorderRadius.circular(30)
+            ),
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.search),
+                Text('笔记本', style: TextStyle(fontSize: 14),)
+              ],
+            ),
+          ),
+          onTap: (){
+            Navigator.pushNamed(context, '/search');
+          },
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.message, size: 28, color: Colors.black87),
+            onPressed: null,
+          )
+        ],
+      ),
+      body: ListView(
+        children: <Widget>[
+          _swiperWidget(),
+          SizedBox(height: ScreenAdapter.height(20)),
+          _titleWidget('猜你喜欢'),
+          SizedBox(height: ScreenAdapter.height(20)),
+          _likeWidget(),
+          _titleWidget('热门推荐'),
+          SizedBox(height: ScreenAdapter.height(20)),
+          _hotWidget(),
+        ],
+      ),
     );
   }
 

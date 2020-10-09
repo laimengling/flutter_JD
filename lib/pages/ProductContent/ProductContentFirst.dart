@@ -1,152 +1,246 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_jdshop/pages/widget/JdButton.dart';
-import 'package:flutter_jdshop/services/ScreenAdapter.dart';
+import 'package:dio/dio.dart';
+import '../../config/Config.dart';
+import '../../pages/widget/JdButton.dart';
+import '../../services/ScreenAdapter.dart';
+import '../../model/ProductContentModel.dart';
+//import 'package:provider/provider.dart';
 
 class ProductContentFirst extends StatefulWidget {
+  Map arguments;
+  ProductContentFirst({Key key, this.arguments}): super(key:key);
   @override
-  _ProductContentFirstState createState() => _ProductContentFirstState();
+  _ProductContentFirstState createState() => _ProductContentFirstState(this.arguments);
 }
 
-class _ProductContentFirstState extends State<ProductContentFirst> {
+class _ProductContentFirstState extends State<ProductContentFirst> with AutomaticKeepAliveClientMixin{
 
-  _addShopcar() {
+  Map _arguments;
+  List<Attr> _attr = [];
+  ProductContentitem _pCItem;
+  String _selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    this._getProductItem ();
+  }
+
+  _ProductContentFirstState(this._arguments);
+
+  // 初始化，获取商品数据
+  _getProductItem() async{
+    var api = '${Config.domain}api/pcontent?id=${_arguments['sId']}';
+    var result = await Dio().get(api);
+    print(api);
+    var productContent = new ProductContentModel.fromJson(result.data);
+    setState(() {
+      _pCItem = productContent.result;
+      this._attr = _pCItem.attr;
+    });
+    this._initAttr();
+    this._getSelectedAttrValue();
+  }
+  _addShopcar(){}
+
+  // 初始化 Attr 格式化数据
+  _initAttr() {
+    var attr = this._attr;
+    for(var i = 0;i<attr.length;i++) {
+      for(var j=0; j< attr[i].list.length; j++) {
+        if (j == 0) {
+          setState(() {
+            attr[i].attrList.add({
+              "title": attr[i].list[j],
+              "checked": true
+            });
+          });
+        } else {
+          setState(() {
+            attr[i].attrList.add({
+              "title": attr[i].list[j],
+              "checked": false
+            });
+          });
+        }
+      }
+
+    }
+  }
+// Container(
+//                  child: Wrap(
+//                  children: <Widget>[
+//                  InkWell(
+//                  child: Container(
+//                  padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+//                  margin: EdgeInsets.only(left: 10),
+//                  decoration: BoxDecoration(
+//                  color: Colors.red,
+//                  borderRadius: BorderRadius.circular(10)
+//                  ),
+//                  child: Text('红色', style: TextStyle(color: Colors.white),),
+//                  ),
+//                  ),
+//                  InkWell(
+//                  child: Container(
+//                  padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+//                  margin: EdgeInsets.only(left: 10),
+//                  decoration: BoxDecoration(
+//                  color: Colors.black12,
+//                  borderRadius: BorderRadius.circular(10)
+//                  ),
+//                  child: Text('黄色', style: TextStyle(color: Colors.black54),),
+//                  ),
+//                  ),
+//                  ],
+//                  ),
+//                  )
+  // 下拉框选项
+  // 更改属性
+  _changeAttr(cate, title, setBottomState) {
+    var attr = this._attr;
+    for(var i = 0; i < attr.length; i++) {
+      if (attr[i].cate == cate){
+        attr[i].attrList.forEach((element) {
+          if(element['title'] == title){
+            element['checked'] = true;
+          } else {
+            element['checked'] = false;
+          }
+        });
+      }
+    }
+    setBottomState(() { // 注意 改变 showModelBottomSheet 里面的数据来源于 StatefulBuilder
+      this._attr = attr;
+    });
+
+    _getSelectedAttrValue();
+  }
+
+  // 获取选中的值
+  _getSelectedAttrValue() {
+    var _list = this._attr;
+    List tempArr = [];
+    for(var i = 0; i < _list.length; i++) {
+      for( var j = 0; j< _list[i].attrList.length;j++){
+        if(_list[i].attrList[j]['checked'] == true) {
+          tempArr.add(_list[i].attrList[j]['title']);
+        }
+      }
+    }
+    setState(() {
+      this._selectedValue = tempArr.join(',');
+    });
+  }
+
+  // 选择项
+  Widget _showBottomChoose(item, setBottomState){
+      return Container(
+        child: Row(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(top: 5),
+              child: Text('${item.cate}：'),
+            ),
+            Container(
+              child: Wrap(
+                children: item.attrList.map<Widget>((innerItem){
+                  return InkWell(
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      margin: EdgeInsets.only(left: 10),
+                      decoration: BoxDecoration(
+                      color: innerItem['checked']?Colors.red : Colors.black26,
+                      borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: Text('${innerItem['title']}', style: TextStyle(color: Colors.white),),
+                      ),
+                    onTap: (){
+                      _changeAttr(item.cate,innerItem['title'], setBottomState);
+                    },
+                  );
+                }).toList(),
+              ),
+            )
+          ],
+        ),
+      );
 
   }
+  // 下方弹出框展示
   _attrBottomSheet () {
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          // 嵌套 GestureDetector 是为了点击showModalBottomSheet的时候，不会收缩起来
-          return GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-
-            },
-            onDoubleTap: () {
-
-            },
-            child: Container(
-              height: ScreenAdapter.height(500),
-              child: Stack(
-                children: <Widget>[
-                  ListView(
-                    padding: EdgeInsets.all(10),
-                    children: <Widget>[
-                     Column(
-                       mainAxisAlignment: MainAxisAlignment.start,
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: <Widget>[
-                         Wrap(
-                           children: <Widget>[
-                             Container(
-                               padding: EdgeInsets.only(top: 5),
-                               child: Text('颜色：'),
-                             ),
-                             Container(
-                               child: Wrap(
-                                 children: <Widget>[
-                                   InkWell(
-                                     child: Container(
-                                       padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                       margin: EdgeInsets.only(left: 10),
-                                       decoration: BoxDecoration(
-                                           color: Colors.red,
-                                           borderRadius: BorderRadius.circular(10)
-                                       ),
-                                       child: Text('红色', style: TextStyle(color: Colors.white),),
-                                     ),
-                                   ),
-                                   InkWell(
-                                     child: Container(
-                                       padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                       margin: EdgeInsets.only(left: 10),
-                                       decoration: BoxDecoration(
-                                           color: Colors.black12,
-                                           borderRadius: BorderRadius.circular(10)
-                                       ),
-                                       child: Text('黄色', style: TextStyle(color: Colors.black54),),
-                                     ),
-                                   ),
-                                 ],
-                               ),
-                             )
-                           ],
-                         ),
-                         SizedBox(height: ScreenAdapter.height(10),),
-                         Wrap(
-                           children: <Widget>[
-                             Container(
-                               padding: EdgeInsets.only(top: 5),
-                               child: Text('颜色：'),
-                             ),
-                             Container(
-                               child: Wrap(
-                                 children: <Widget>[
-                                   InkWell(
-                                     child: Container(
-                                       padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                       margin: EdgeInsets.only(left: 10),
-                                       decoration: BoxDecoration(
-                                           color: Colors.red,
-                                           borderRadius: BorderRadius.circular(10)
-                                       ),
-                                       child: Text('红色', style: TextStyle(color: Colors.white),),
-                                     ),
-                                   ),
-                                   InkWell(
-                                     child: Container(
-                                       padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                       margin: EdgeInsets.only(left: 10),
-                                       decoration: BoxDecoration(
-                                           color: Colors.black12,
-                                           borderRadius: BorderRadius.circular(10)
-                                       ),
-                                       child: Text('黄色', style: TextStyle(color: Colors.black54),),
-                                     ),
-                                   ),
-                                 ],
-                               ),
-                             )
-                           ],
-                         ),
-                         SizedBox(height: ScreenAdapter.height(10),),
-                       ],
-                     )
-
-                    ],
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    width: ScreenAdapter.width(750),
-                    height: ScreenAdapter.height(100),
-                    child: Row(
+          return StatefulBuilder(
+            builder: (BuildContext context, setBottomState) {
+              return GestureDetector(
+                // 嵌套 GestureDetector 是为了点击showModalBottomSheet的时候，不会收缩起来
+                behavior: HitTestBehavior.opaque,
+                onTap: () {},
+                onDoubleTap: () {},
+                child: Container(
+                    height: ScreenAdapter.height(500),
+                    child: Stack(
                       children: <Widget>[
-                        Container(
+                        ListView(
+                          padding: EdgeInsets.all(10),
+                          children: <Widget>[
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: this._attr.map((attrItem){
+                                return Container(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Wrap(
+                                        children: <Widget>[
+                                          _showBottomChoose(attrItem, setBottomState)
+                                        ],
+                                      ),
+                                      SizedBox(height: ScreenAdapter.height(10),),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            )
+
+                          ],
+                        ),
+                        Positioned(
+                          bottom: 0,
                           width: ScreenAdapter.width(750),
                           height: ScreenAdapter.height(100),
                           child: Row(
                             children: <Widget>[
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  child: JdButton(color: Colors.red,text:'加入购物车',cb: _addShopcar),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  child: JdButton(color: Colors.yellow,text:'立即购买',cb: _addShopcar),
+                              Container(
+                                width: ScreenAdapter.width(750),
+                                height: ScreenAdapter.height(100),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                        child: JdButton(color: Colors.red,text:'加入购物车',cb: _addShopcar),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                        child: JdButton(color: Colors.yellow,text:'立即购买',cb: _addShopcar),
+                                      ),
+                                    )
+                                  ],
                                 ),
                               )
                             ],
                           ),
                         )
                       ],
-                    ),
-                  )
-                ],
-              )
-            ),
+                    )
+                ),
+              );
+            },
           );
         }
     );
@@ -155,18 +249,22 @@ class _ProductContentFirstState extends State<ProductContentFirst> {
   @override
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
+    var pic = '';
+    pic = Config.domain + _pCItem.pic;
+    pic = pic.replaceAll('\\', '/');
+
     return Container(
       padding: EdgeInsets.all(10),
       child: ListView(
         children: <Widget>[
           AspectRatio(
-            aspectRatio: 16/9,
-            child: Image.network('https://www.itying.com/images/flutter/p1.jpg', fit: BoxFit.cover),
+            aspectRatio: 16/15,
+            child: Image.network('${pic}', fit: BoxFit.cover),
           ),
           Container(
             padding: EdgeInsets.only(top: 10),
             child: Text(
-              '联想ThinkPad 翼480（0VCD） 英特尔酷睿i5 14英寸轻薄窄边框笔记本电脑',
+              '${_pCItem.title}',
               style: TextStyle(
                 color: Colors.black87,
                 fontSize: ScreenAdapter.setSp(38)
@@ -176,7 +274,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> {
           Container(
             padding: EdgeInsets.only(top: 10),
             child: Text(
-              '震撼首发，15.9毫米全金属外观，4.9毫米轻薄窄边框，指纹电源按钮，杜比音效，2G独显，预装正版office软件',
+              '${_pCItem.subTitle}',
               style: TextStyle(
                 color: Colors.black54,
                 fontSize: ScreenAdapter.setSp(26)
@@ -199,7 +297,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> {
                         ),
                       ),
                       Text(
-                          '￥26',
+                          '￥${this._pCItem.price}',
                         style: TextStyle(
                           fontSize: ScreenAdapter.setSp(36),
                           color: Colors.red
@@ -218,7 +316,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> {
                             fontSize: ScreenAdapter.setSp(26)
                         )
                       ),
-                      Text('￥35',
+                      Text('￥${this._pCItem.oldPrice}',
                         style: TextStyle(
                             fontSize: ScreenAdapter.setSp(26),
                             decoration: TextDecoration.lineThrough
@@ -234,7 +332,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> {
           Container(
             padding: EdgeInsets.only(top: 10),
             margin: EdgeInsets.only(bottom: 10),
-            child: InkWell(
+            child: this._attr.length != 0? InkWell(
               onTap: () {
                 _attrBottomSheet();
               },
@@ -248,14 +346,14 @@ class _ProductContentFirstState extends State<ProductContentFirst> {
                     ),
                   ),
                   Text(
-                      '115黑色，XL，1件',
+                      '${this._selectedValue}',
                       style: TextStyle(
                           fontSize: ScreenAdapter.setSp(26)
                       )
                   ),
                 ],
               ),
-            ),
+            ): Text(''),
           ),
           Divider(
             height: 1
@@ -272,7 +370,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> {
                   ),
                 ),
                 Text(
-                    '免费',
+                    '${this._pCItem.salecount == 0? '免费': this._pCItem.salecount}',
                     style: TextStyle(
                         fontSize: ScreenAdapter.setSp(26)
                     )
@@ -284,4 +382,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive =>  true;
 }

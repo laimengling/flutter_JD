@@ -5,11 +5,14 @@ class ProductContentThird extends StatefulWidget {
   _ProductContentThirdState createState() => _ProductContentThirdState();
 }
 
-class _ProductContentThirdState extends State<ProductContentThird> {
+class _ProductContentThirdState extends State<ProductContentThird> with AutomaticKeepAliveClientMixin{
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Text('3'),
-    );
+        child: Text('3'),
+      );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

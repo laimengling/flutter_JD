@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'routes/Routes.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
