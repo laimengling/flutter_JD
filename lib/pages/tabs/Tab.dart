@@ -12,7 +12,7 @@ class Tabs extends StatefulWidget {
 
 class _TabsState extends State<Tabs> {
 
-  int _currentIndex  = 0;
+  int _currentIndex  = 3;
 
   // 创建页面控制器
   var _pageController;
