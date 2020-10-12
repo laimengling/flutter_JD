@@ -1,40 +1,49 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../pages/Cart/CartItem.dart';
-import 'package:flutter_jdshop/pages/widget/JdButton.dart';
 import 'package:flutter_jdshop/services/ScreenAdapter.dart';
+import '../../provider/Cart.dart';
 
 class CartPage extends StatefulWidget {
   @override
   _CartPageState createState() => _CartPageState();
 }
 
-class _CartPageState extends State<CartPage> with AutomaticKeepAliveClientMixin{
+class _CartPageState extends State<CartPage>{
 
-  // 全选
-  _chooseAll() {
-
-  }
+  var cartProvider;
+  bool isEdit = false;
 
   @override
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
+    this.cartProvider = Provider.of<Cart>(context);
+    this.cartProvider.isCheckAll();
     return Scaffold(
       appBar: AppBar(
-        title: Text('购物车页面',textAlign: TextAlign.center,),
+        title: Text('购物车',textAlign: TextAlign.center,),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.launch,color: Colors.black,)
+            icon: Icon(Icons.launch,color: Colors.black,),
+            onPressed: (){
+              setState(() {
+                this.isEdit = !this.isEdit;
+              });
+            },
           )
         ],
       ),
-      body: Stack(
+      body: cartProvider.cartList.length> 0?Stack(
         children: <Widget>[
           ListView(
             children: <Widget>[
-               CartItem(),
-              CartItem(), CartItem(), CartItem(),
-
+              Column(
+                children: cartProvider.cartList.map<Widget>((e){
+                      return CartItem(e);
+                }).toList(),
+              ),
+              SizedBox(height: ScreenAdapter.height(100),)
             ],
           ),
           Positioned(
@@ -45,6 +54,7 @@ class _CartPageState extends State<CartPage> with AutomaticKeepAliveClientMixin{
               width: ScreenAdapter.width(750),
               height: ScreenAdapter.height(100),
               decoration: BoxDecoration(
+                color: Colors.white,
                 border: Border(
                   top: BorderSide(
                     color: Colors.black12
@@ -58,36 +68,63 @@ class _CartPageState extends State<CartPage> with AutomaticKeepAliveClientMixin{
                     child: Row(
                       children: <Widget>[
                         Checkbox(
-                          value: false,
+                          value: cartProvider.isCheckedAll,
+                          onChanged: (v) {
+                            // 全选
+                            this.cartProvider.checkAll(v);
+                          },
+                          activeColor: Colors.pink,
                         ),
                         Text("全选")
                       ],
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: RaisedButton(
-                      child: Text("结算",style: TextStyle(
-                          color: Colors.white
-                      )),
-                      color:Colors.red,
-
-                      onPressed: (){
-
-                      },
+                  !this.isEdit?Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                        "￥${this.cartProvider.allPrice}",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold
+                      ),
                     ),
-                  )
+                  ): Align(
+                    alignment: Alignment.center,
+                  ),
+                 this.isEdit == true? Align(
+                   alignment: Alignment.centerRight,
+                   child: RaisedButton(
+                     child: Text("删除",style: TextStyle(
+                         color: Colors.white
+                     )),
+                     color:Colors.red,
+                     onPressed: (){
+                       this.cartProvider.removeSelectedItem();
+                     },
+                   ),
+                 ): Align(
+                   alignment: Alignment.centerRight,
+                   child: RaisedButton(
+                     child: Text("结算",style: TextStyle(
+                         color: Colors.white
+                     )),
+                     color:Colors.red,
 
+                     onPressed: (){
+
+                     },
+                   ),
+                 )
                 ],
               ),
             ),
           )
         ],
-      ),
+      ): Center(child: Text('购物车空空……'),),
     );
   }
-
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
+//
+//  @override
+//  bool get wantKeepAlive => true;
 }

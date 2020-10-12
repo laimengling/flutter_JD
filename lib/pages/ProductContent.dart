@@ -1,6 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_jdshop/services/ScreenAdapter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../provider/Cart.dart';
+import 'package:provider/provider.dart';
+import '../config/Config.dart';
+import '../model/ProductContentModel.dart';
+import '../services/CartServices.dart';
+import '../services/ScreenAdapter.dart';
 import 'ProductContent/ProductContentFirst.dart';
 import 'ProductContent/ProductContentSecond.dart';
 import 'ProductContent/ProductContentThree.dart';
@@ -15,17 +22,37 @@ class ProductContentPage extends StatefulWidget {
 
 class _ProductContentPageState extends State<ProductContentPage> {
   Map arguments;
+
+
+  List _productContentList=[];
+
+  var cartProvider;
+
   _ProductContentPageState(this.arguments);
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    // print(this._productContentData.sId);
+
+    this._getContentData();
+  }
+  _getContentData() async{
+
+    var api ='${Config.domain}api/pcontent?id=${arguments['sId']}';
+
+    var result = await Dio().get(api);
+    var productContent = new ProductContentModel.fromJson(result.data);
+    setState(() {
+      this._productContentList.add(productContent.result);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
+    this.cartProvider = Provider.of<Cart>(context);
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -75,9 +102,10 @@ class _ProductContentPageState extends State<ProductContentPage> {
         body: Stack(
           children: <Widget>[
             TabBarView(
+              physics: NeverScrollableScrollPhysics(), // 禁止tabView 滑动
               children: <Widget>[
-                ProductContentFirst(arguments: arguments),
-                ProductContentSecond(arguments: arguments),
+                ProductContentFirst(this._productContentList),
+                ProductContentSecond(this._productContentList),
                 ProductContentThird()
               ],
             ),
@@ -96,16 +124,23 @@ class _ProductContentPageState extends State<ProductContentPage> {
                 ),
                 child: Row(
                   children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(top: 5),
-                      width: ScreenAdapter.width(270),
-                      height: ScreenAdapter.height(100),
-                      child: Column(
-                        children: <Widget>[
-                          Icon(Icons.shopping_cart),
-                          Text('购物车',style: TextStyle(fontSize: 10),)
-                        ],
+                    InkWell(
+                      child: Container(
+                        padding: EdgeInsets.only(top: 
+                        ScreenAdapter.width(20)
+                        ),
+                        width: ScreenAdapter.width(270),
+                        height: ScreenAdapter.height(100),
+                        child: Column(
+                          children: <Widget>[
+                            Icon(Icons.shopping_cart, size: ScreenAdapter.setSp(40),),
+                            Text('购物车',style: TextStyle(fontSize: 10),)
+                          ],
+                        ),
                       ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/cart');
+                      },
                     ),
                     Expanded(
                       flex: 1,
@@ -120,10 +155,23 @@ class _ProductContentPageState extends State<ProductContentPage> {
                             margin: EdgeInsets.only(right: 20),
                             child: InkWell(
                               child: Text('加入购物车', style: TextStyle(color: Colors.white),),
-                              onTap: (){
+                              onTap: ()async{
                                 // 广播 这里有不合理的地方，如果她的attr是空的，在ProductContentFirst接收到广播仍然会弹出空白 Container
                                 // 改造 数据在ProductContent 查询，传到ProductContentFirst
-                                eventBus.fire(new ProductContentEvent('加入购物车'));
+                                if (this._productContentList[0].attr.length >0) {
+                                  eventBus.fire(new ProductContentEvent('加入购物车'));
+                                } else {
+                                  Fluttertoast.showToast(
+                                      msg: '加入购物车成功',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      backgroundColor: Colors.black,
+                                      textColor: Colors.white
+                                  );
+                                  await CartServices.addCart(this._productContentList[0]);
+                                  // 调用Provider 更新数据
+                                  this.cartProvider.updateCartList();
+                                }
                               },
                             )
                           ),
@@ -137,7 +185,12 @@ class _ProductContentPageState extends State<ProductContentPage> {
                               child: InkWell(
                                 child: Text('立即购买', style: TextStyle(color: Colors.white),),
                                 onTap: (){
-                                  eventBus.fire(new ProductContentEvent('立即购买'));
+                                  if(this._productContentList[0].attr.length>0){
+                                    //广播 弹出筛选
+                                    eventBus.fire(new ProductContentEvent('立即购买'));
+                                  }else{
+                                    print("立即购买");
+                                  }
                                 },
                               )
                           ),

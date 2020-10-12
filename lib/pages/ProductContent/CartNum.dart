@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
+import '../../model/ProductContentModel.dart';
 import '../../services/ScreenAdapter.dart';
-import '../../provider/Cart.dart';
-import 'package:provider/provider.dart';
-class CartNum extends StatefulWidget {
-  Map itemData;
-  CartNum(this.itemData, {Key key}): super(key: key);
 
+class CartNum extends StatefulWidget {
+  ProductContentitem _productContent;
+  CartNum(this._productContent,{Key key}):super(key: key);
   @override
   _CartNumState createState() => _CartNumState();
 }
 
 class _CartNumState extends State<CartNum> {
+  var _productContent;
 
-  Map _itemData;
-  var cartProvider;
   @override
   void initState() {
     super.initState();
-    this._itemData = widget.itemData;
   }
 
   @override
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
-    this.cartProvider = Provider.of<Cart>(context);
+    // 注意：给属性赋值
+    this._productContent = widget._productContent;
     return Container(
       width: ScreenAdapter.width(164),
       child: Row(
@@ -39,12 +37,11 @@ class _CartNumState extends State<CartNum> {
               ),
             ),
             onTap: (){
-              if(this._itemData['count'] > 1){
+              if(this._productContent.count>1){
                 setState(() {
-                  this._itemData['count']--;
+                  this._productContent.count--;
                 });
               }
-              this.cartProvider.changeItemCount();
             },
           ),
           Container(
@@ -57,7 +54,7 @@ class _CartNumState extends State<CartNum> {
                 )
             ),
             alignment: Alignment.center,
-            child: Text('${_itemData['count']}'),
+            child: Text('${this._productContent.count}'),
           ),
           InkWell(
             child: Container(
@@ -71,9 +68,8 @@ class _CartNumState extends State<CartNum> {
             ),
             onTap: (){
               setState(() {
-                this._itemData['count'] ++;
+                this._productContent.count++;
               });
-              this.cartProvider.changeItemCount();
             },
           ),
         ],

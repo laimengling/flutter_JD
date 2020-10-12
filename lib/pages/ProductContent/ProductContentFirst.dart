@@ -1,34 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_jdshop/pages/Cart/CartNum.dart';
+import '../../services/CartServices.dart';
+import '../ProductContent/CartNum.dart';
 import '../../config/Config.dart';
 import '../../pages/widget/JdButton.dart';
 import '../../services/ScreenAdapter.dart';
 import '../../model/ProductContentModel.dart';
-//import 'package:provider/provider.dart';
+import 'package:provider/provider.dart';
+import '../../provider/Cart.dart';
 import '../../services/EventBus.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ProductContentFirst extends StatefulWidget {
-  Map arguments;
-  ProductContentFirst({Key key, this.arguments}): super(key:key);
+  List _productContentList=[];
+  ProductContentFirst(this._productContentList, {Key key}): super(key:key);
   @override
-  _ProductContentFirstState createState() => _ProductContentFirstState(this.arguments);
+  _ProductContentFirstState createState() => _ProductContentFirstState(this._productContentList);
 }
 
 class _ProductContentFirstState extends State<ProductContentFirst> with AutomaticKeepAliveClientMixin{
 
-  Map _arguments;
+  List _productContentList=[];
   List<Attr> _attr = [];
   ProductContentitem _pCItem;
   String _selectedValue;
   var actionEventBus;
+  var cartProvider;
+  _ProductContentFirstState(this._productContentList);
+
   @override
   void initState() {
     super.initState();
-    this._getProductItem ();
+    _pCItem = this._productContentList[0];
+    this._attr = _pCItem.attr;
+
+    this._initAttr();
+
+    this._getSelectedAttrValue();
     // 监听广播
     this.actionEventBus = eventBus.on<ProductContentEvent>().listen((event) {
-      print(event);
       this._attrBottomSheet();
     });
   }
@@ -39,27 +48,14 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
     this.actionEventBus.cancel(); // 取消事件监听
   }
 
-  _ProductContentFirstState(this._arguments);
-
-  // 初始化，获取商品数据
-  _getProductItem() async{
-    var api = '${Config.domain}api/pcontent?id=${_arguments['sId']}';
-    var result = await Dio().get(api);
-    print(api);
-    var productContent = new ProductContentModel.fromJson(result.data);
-    setState(() {
-      _pCItem = productContent.result;
-      this._attr = _pCItem.attr;
-    });
-    this._initAttr();
-    this._getSelectedAttrValue();
-  }
   _addShopcar(){}
 
   // 初始化 Attr 格式化数据
   _initAttr() {
     var attr = this._attr;
     for(var i = 0;i<attr.length;i++) {
+      // 缓存页面的时候，tab切换在缓存基础上，加载时又添加新的attrList，因此置空
+      attr[i].attrList.clear();
       for(var j=0; j< attr[i].list.length; j++) {
         if (j == 0) {
           setState(() {
@@ -114,6 +110,8 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
     }
     setState(() {
       this._selectedValue = tempArr.join(',');
+      // 给筛选属性赋值
+      this._pCItem.selectedAttr = _selectedValue;
     });
   }
 
@@ -199,7 +197,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
                                   Container(
                                     child: Wrap(
                                       children: <Widget>[
-                                        CartNum()
+                                        CartNum(this._pCItem)
                                       ],
                                     ),
                                   )
@@ -222,7 +220,17 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
                                     Expanded(
                                       flex: 1,
                                       child: Container(
-                                        child: JdButton(color: Colors.red,text:'加入购物车',cb: _addShopcar),
+                                        child: JdButton(color: Colors.red,text:'加入购物车',cb: ()async{
+                                          await CartServices.addCart(this._pCItem);
+                                          Navigator.of(context).pop();
+                                          // 调用Provider 更新数据
+                                          this.cartProvider.updateCartList();
+                                          Fluttertoast.showToast(
+                                              msg: '加入购物车成功',
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.CENTER,
+                                          );
+                                        }),
                                       ),
                                     ),
                                     Expanded(
@@ -250,17 +258,14 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
   @override
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
-    var pic = '';
-    pic = Config.domain + _pCItem.pic;
-    pic = pic.replaceAll('\\', '/');
-
+    this.cartProvider = Provider.of<Cart>(context);
     return Container(
       padding: EdgeInsets.all(10),
       child: ListView(
         children: <Widget>[
           AspectRatio(
             aspectRatio: 16/15,
-            child: Image.network('${pic}', fit: BoxFit.cover),
+            child: Image.network('${(Config.domain + _pCItem.pic).replaceAll('\\', '/')}', fit: BoxFit.cover),
           ),
           Container(
             padding: EdgeInsets.only(top: 10),

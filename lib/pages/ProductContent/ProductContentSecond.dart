@@ -3,18 +3,18 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 //import '../../config/Config.dart';
 
 class ProductContentSecond extends StatefulWidget {
-  Map arguments;
-  ProductContentSecond({Key key, this.arguments}): super(key:key);
+  List _productContentList=[];
+  ProductContentSecond(this._productContentList, {Key key}): super(key:key);
   @override
-  _ProductContentSecondState createState() => _ProductContentSecondState(this.arguments);
+  _ProductContentSecondState createState() => _ProductContentSecondState(this._productContentList);
 }
 
 class _ProductContentSecondState extends State<ProductContentSecond> with AutomaticKeepAliveClientMixin{
   // 加载html字段
   InAppWebViewController webView;
-  Map arguments;
+  List _productContentList=[];
 
-  _ProductContentSecondState(this.arguments);
+  _ProductContentSecondState(this._productContentList);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class _ProductContentSecondState extends State<ProductContentSecond> with Automa
         children: <Widget>[
           Expanded(
             child: InAppWebView(
-              initialUrl: "http://jd.itying.com/pcontent?id=${arguments['sId']}",
+              initialUrl: "http://jd.itying.com/pcontent?id=${this._productContentList[0].sId}",
               onProgressChanged: (InAppWebViewController controller, int progress) {
 
               },
