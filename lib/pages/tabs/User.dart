@@ -34,41 +34,46 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                     ),
                   ),
                 ),
-//                Expanded(
-//                  flex: 1,
-//                  child: Text(
-//                      '登录/注册',
-//                    style: TextStyle(
-//                      color: Colors.white
-//                    ),
-//                  ),
-//                ),
                 Expanded(
                   flex: 1,
-                  child: Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "用户名：18760375007",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12
-                          ),
-                        ),
-                        Text(
-                          "普通用户",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12
-                          ),
-                        ),
-                      ],
+                  child: InkWell(
+                    child: Text(
+                      '登录/注册',
+                      style: TextStyle(
+                          color: Colors.white
+                      ),
                     ),
-                    height: ScreenAdapter.height(100),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
                   ),
-                )
+                ),
+//                Expanded(
+//                  flex: 1,
+//                  child: Container(
+//                    child: Column(
+//                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+//                      crossAxisAlignment: CrossAxisAlignment.start,
+//                      children: <Widget>[
+//                        Text(
+//                          "用户名：18760375007",
+//                          style: TextStyle(
+//                              color: Colors.white,
+//                              fontSize: 12
+//                          ),
+//                        ),
+//                        Text(
+//                          "普通用户",
+//                          style: TextStyle(
+//                              color: Colors.white,
+//                              fontSize: 12
+//                          ),
+//                        ),
+//                      ],
+//                    ),
+//                    height: ScreenAdapter.height(100),
+//                  ),
+//                )
               ],
             ),
           ),
