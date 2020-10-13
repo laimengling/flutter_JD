@@ -20,6 +20,7 @@ class _CartPageState extends State<CartPage>{
   var checkOutProvider;
   bool isEdit = false;
 
+  // 结算操作
   doCheckOut() async{
     bool isLogin = await UserServices.getUserLoginState();
     var checkOutData = await CartServices.getCheckOutData();

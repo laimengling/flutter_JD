@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../pages/Address/AddressAdd.dart';
+import '../pages/Address/AddressList.dart';
 import '../pages/CheckOut.dart';
 import '../pages/Login.dart';
 import '../pages/RegisterFirst.dart';
@@ -21,6 +23,8 @@ final routes = {
   '/registerSecond':(context, { arguments }) => RegisterSecond(arguments: arguments),
   '/registerThird':(context, { arguments }) => RegisterThird(arguments: arguments),
   '/checkOut':(context) => CheckOutPage(),
+  '/addressList':(context) => AddressList(),
+  '/addressAdd': (context) => AddressAdd(),
   /*
   '/product': (context) => ProductPage(),
   '/productInfo': (context, { arguments }) => ProductInfoPage(arguments: arguments),

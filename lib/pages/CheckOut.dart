@@ -84,13 +84,16 @@ class _CheckOutPageState extends State<CheckOutPage> {
                 ),
                 child: Column(
                   children: <Widget>[
-//                    ListTile(
-//                      leading: Icon(Icons.add_location),
-//                      title: Center(
-//                        child: Text('请添加收获地址'),
-//                      ),
-//                      trailing: Icon(Icons.navigate_next),
-//                    ),
+                    ListTile(
+                      leading: Icon(Icons.add_location),
+                      title: Center(
+                        child: Text('请添加收获地址'),
+                      ),
+                      trailing: Icon(Icons.navigate_next),
+                      onTap: (){
+                        Navigator.pushNamed(context, '/addressAdd');
+                      },
+                    ),
                     ListTile(
                       title: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -104,6 +107,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         ],
                       ),
                       trailing: Icon(Icons.navigate_next),
+                      onTap: (){
+                        Navigator.pushNamed(context, '/addressList');
+                      },
                     ),
                   ],
                 ),
