@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../provider/CheckOut.dart';
+import '../../services/CartServices.dart';
+import '../../services/UserServices.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../pages/Cart/CartItem.dart';
-import 'package:flutter_jdshop/services/ScreenAdapter.dart';
+import '../../services/ScreenAdapter.dart';
 import '../../provider/Cart.dart';
 
 class CartPage extends StatefulWidget {
@@ -13,13 +17,42 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage>{
 
   var cartProvider;
+  var checkOutProvider;
   bool isEdit = false;
+
+  doCheckOut() async{
+    bool isLogin = await UserServices.getUserLoginState();
+    var checkOutData = await CartServices.getCheckOutData();
+    this.checkOutProvider.changeCheckOutListData(checkOutData);
+    if(checkOutData.length > 0) {
+      if(isLogin){
+        Navigator.pushNamed(context, '/checkOut');
+      } else {
+        Fluttertoast.showToast(
+          msg: '还未登录，不可结算',
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+        );
+      }
+    } else {
+      Fluttertoast.showToast(
+        msg: '购物车还没有选中的数据',
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
     this.cartProvider = Provider.of<Cart>(context);
     this.cartProvider.isCheckAll();
+    this.checkOutProvider = Provider.of<CheckOut>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('购物车',textAlign: TextAlign.center,),
@@ -110,10 +143,7 @@ class _CartPageState extends State<CartPage>{
                          color: Colors.white
                      )),
                      color:Colors.red,
-
-                     onPressed: (){
-
-                     },
+                     onPressed: this.doCheckOut,
                    ),
                  )
                 ],

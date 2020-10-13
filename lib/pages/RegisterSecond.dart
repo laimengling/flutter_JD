@@ -70,7 +70,10 @@ class _RegisterSecondState extends State<RegisterSecond> {
     var api = '${Config.domain}api/validateCode';
     var response = await Dio().post(api, data: {"tel": this.tel,"code": this.code});
     if (response.data["success"]) {
-      Navigator.pushNamed(context, '/registerThird');
+      Navigator.pushNamed(context, '/registerThird', arguments: {
+        'tel': this.tel,
+        'code': this.code
+      });
     }else{
       Fluttertoast.showToast(
         msg: '${response.data["message"]}',
@@ -139,10 +142,8 @@ class _RegisterSecondState extends State<RegisterSecond> {
                       fontSize: 12
                   ),
                 ),
-
               ],
-            )
-
+            ),
           ],
         ),
       ),

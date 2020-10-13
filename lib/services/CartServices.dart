@@ -50,4 +50,21 @@ class CartServices {
     data['checked'] = true;
     return data;
   }
+
+  // 获取购物车选中的数据
+  static getCheckOutData() async{
+    List cartListData;
+    try {
+      cartListData = json.decode(await Storage.getString('cartList'));
+    } catch (e) {
+      cartListData = [];
+    }
+    List tempList = new List();
+    cartListData.forEach((element) {
+      if(element['checked'] == true){
+        tempList.add(element);
+      }
+    });
+    return tempList;
+  }
 }

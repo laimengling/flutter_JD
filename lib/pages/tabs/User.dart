@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jdshop/pages/widget/JdButton.dart';
 import '../../services/ScreenAdapter.dart';
+import '../../services/UserServices.dart';
+import '../../services/EventBus.dart';
 
 class UserPage extends StatefulWidget {
   @override
@@ -7,9 +10,33 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
+
+  bool isLogin = false;
+  List userInfo = [];
+
+  @override
+  void initState() {
+    super.initState();
+    this._getUserinfo();
+    // 监听登录页面改变的事件
+    eventBus.on<UserEvent>().listen((event) {
+      this._getUserinfo();
+    });
+  }
+
+  _getUserinfo() async{
+    var userInfo =await UserServices.getUserInfo();
+    var isLogin = await UserServices.getUserLoginState();
+    setState(() {
+      this.userInfo  = userInfo;
+      this.isLogin =  isLogin;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
+
     return Scaffold(
       body: ListView(
         children: <Widget>[
@@ -34,7 +61,32 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                     ),
                   ),
                 ),
-                Expanded(
+                isLogin?Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "用户名：${this.userInfo[0]['username']}",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12
+                          ),
+                        ),
+                        Text(
+                          "普通用户",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12
+                          ),
+                        ),
+                      ],
+                    ),
+                    height: ScreenAdapter.height(100),
+                  ),
+                ):Expanded(
                   flex: 1,
                   child: InkWell(
                     child: Text(
@@ -48,32 +100,7 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                     },
                   ),
                 ),
-//                Expanded(
-//                  flex: 1,
-//                  child: Container(
-//                    child: Column(
-//                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                      crossAxisAlignment: CrossAxisAlignment.start,
-//                      children: <Widget>[
-//                        Text(
-//                          "用户名：18760375007",
-//                          style: TextStyle(
-//                              color: Colors.white,
-//                              fontSize: 12
-//                          ),
-//                        ),
-//                        Text(
-//                          "普通用户",
-//                          style: TextStyle(
-//                              color: Colors.white,
-//                              fontSize: 12
-//                          ),
-//                        ),
-//                      ],
-//                    ),
-//                    height: ScreenAdapter.height(100),
-//                  ),
-//                )
+
               ],
             ),
           ),
@@ -105,6 +132,14 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
             leading: Icon(Icons.people, color: Colors.black54),
             title: Text('在线客服'),
           ),
+          Divider(),
+          isLogin?JdButton(
+            text: '退出登录',
+            cb: () {
+              UserServices.loginOut();
+              this._getUserinfo();
+            },
+          ):Text('')
         ],
       ),
     );

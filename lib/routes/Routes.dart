@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_jdshop/pages/Login.dart';
+import '../pages/CheckOut.dart';
+import '../pages/Login.dart';
 import '../pages/RegisterFirst.dart';
 import '../pages/RegisterSecond.dart';
 import '../pages/RegisterThird.dart';
@@ -18,7 +19,8 @@ final routes = {
   '/login':(context) => LoginPage(),
   '/registerFirst':(context) => RegisterFirst(),
   '/registerSecond':(context, { arguments }) => RegisterSecond(arguments: arguments),
-  '/registerThird':(context) => RegisterThird(),
+  '/registerThird':(context, { arguments }) => RegisterThird(arguments: arguments),
+  '/checkOut':(context) => CheckOutPage(),
   /*
   '/product': (context) => ProductPage(),
   '/productInfo': (context, { arguments }) => ProductInfoPage(arguments: arguments),

@@ -13,7 +13,7 @@ class JdText extends StatelessWidget {
     return Container(
       child: TextField(
         obscureText: this.password,
-        autofocus: true,
+        autofocus: this.focus,
         decoration: InputDecoration(
           hintText: '${this.text}',
           hintStyle: TextStyle(

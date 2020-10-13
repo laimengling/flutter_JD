@@ -9,3 +9,11 @@ class ProductContentEvent{
     this.str = str;
   }
 }
+
+class UserEvent{
+  String str;
+
+  UserEvent(String str) {
+    this.str = str;
+  }
+}

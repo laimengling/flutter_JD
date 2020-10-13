@@ -11,7 +11,7 @@ class RegisterFirst extends StatefulWidget {
 }
 
 class _RegisterFirstState extends State<RegisterFirst> {
-  String tel;
+  String tel = '';
   bool next = false;
   sendCode() async{
     RegExp reg = new RegExp(r"^1\d{10}$");

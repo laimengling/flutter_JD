@@ -31,15 +31,9 @@ class Cart with ChangeNotifier{
     init();
   }
 
-  itemCountChange() {
-    Storage.setString('cartList', json.encode(this._cartList));
-    // 计算总价
-    computeAllPrice();
-    notifyListeners();
-  }
   // shopcart item count
    changeItemCount() async{
-//    List cartListData = json.decode(await Storage.getString('cartList'));
+    Storage.setString('cartList', json.encode(this._cartList));
     // 计算总价
     computeAllPrice();
     notifyListeners();
