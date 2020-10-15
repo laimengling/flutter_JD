@@ -4,9 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_jdshop/config/Config.dart';
+import 'package:flutter_jdshop/provider/Cart.dart';
 import 'package:flutter_jdshop/services/EventBus.dart';
 import 'package:flutter_jdshop/services/SignServices.dart';
 import 'package:flutter_jdshop/services/UserServices.dart';
+import 'package:flutter_jdshop/services/CheckOutServices.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../pages/widget/JdButton.dart';
 import '../provider/CheckOut.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +24,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
   var checkOutProvider;
   List addressList = [];
-
+  double allPrice;
+  var cartProvider;
   @override
   initState() {
     super.initState();
@@ -29,6 +33,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
     eventBus.on<CheckOutEvent>().listen((event) {
       this._getDefaultAddress();
     });
+
   }
 
   _getDefaultAddress() async{
@@ -108,16 +113,35 @@ class _CheckOutPageState extends State<CheckOutPage> {
       'address': this.addressList[0]['address'],
       'phone': this.addressList[0]['phone'],
       'name': this.addressList[0]['name'],
-      'all_price': this.addressList[0][''],
+      'all_price': this.allPrice,
       'products': json.encode(this.checkOutProvider.checkOutList)
     };
     var sign = SignServices.getSign(tempJson);
-    var api = "${Config.domain}api/oneAddressList?uid=${userInfo[0]['_id']}&sign=${sign}";
+    var api = "${Config.domain}api/doOrder";
 
-    var response = await Dio().get(api);
-    setState(() {
-      this.addressList = List.from(response.data['result']);
+    var response = await Dio().post(api, data: {
+      'uid': userInfo[0]['_id'],
+      'sign': sign,
+      'address': this.addressList[0]['address'],
+      'phone': this.addressList[0]['phone'],
+      'name': this.addressList[0]['name'],
+      'all_price': this.allPrice.toStringAsFixed(1),
+      'products': json.encode(this.checkOutProvider.checkOutList)
     });
+    if(response.data['success']) {
+      // 删除购物车选中的商品数据
+      await CheckOutServices.removeSelectedItem();
+      // 更新购物车数据
+      cartProvider.updateCartList();
+      // 跳转到支付页面
+      Navigator.pushNamed(context, '/pay');
+    } else {
+      Fluttertoast.showToast(
+        msg: '${response.data["message"]}',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+    }
   }
 
   // 获取总价格
@@ -126,6 +150,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
     this.checkOutProvider = Provider.of<CheckOut>(context);
+    this.cartProvider = Provider.of<Cart>(context);
+    setState(() {
+      this.allPrice = CheckOutServices.getAllPrice(this.checkOutProvider.checkOutList);
+    });
     return Scaffold(
       appBar: AppBar(
         title: Text('订单页面'),
@@ -202,7 +230,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('商品总金额：￥100'),
+                    Text('商品总金额：￥${this.allPrice}'),
                     Divider(),
                     Text('立减：￥5'),
                     Divider(),
@@ -235,7 +263,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
                       children: <Widget>[
                         Text('实付款：'),
-                        Text('￥128元', style: TextStyle(color: Colors.red),)
+                        Text('￥${this.allPrice}元', style: TextStyle(color: Colors.red),)
                       ],
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -244,7 +272,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                   Container(
                     width: ScreenAdapter.width(200),
                     child: JdButton(color: Colors.red,text: '立即下单',cb: (){
-
+                      this.doOrder();
                     }),
                   )
                 ],
