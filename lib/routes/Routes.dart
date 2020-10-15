@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jdshop/pages/Address/AddressEdit.dart';
 import '../pages/Address/AddressAdd.dart';
 import '../pages/Address/AddressList.dart';
 import '../pages/CheckOut.dart';
@@ -25,6 +26,7 @@ final routes = {
   '/checkOut':(context) => CheckOutPage(),
   '/addressList':(context) => AddressList(),
   '/addressAdd': (context) => AddressAdd(),
+  '/addressEdit':(context, { arguments }) => AddressEdit(arguments: arguments)
   /*
   '/product': (context) => ProductPage(),
   '/productInfo': (context, { arguments }) => ProductInfoPage(arguments: arguments),

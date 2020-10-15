@@ -1,5 +1,12 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_jdshop/config/Config.dart';
+import 'package:flutter_jdshop/services/EventBus.dart';
+import 'package:flutter_jdshop/services/SignServices.dart';
+import 'package:flutter_jdshop/services/UserServices.dart';
 import '../pages/widget/JdButton.dart';
 import '../provider/CheckOut.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +20,31 @@ class CheckOutPage extends StatefulWidget {
 class _CheckOutPageState extends State<CheckOutPage> {
 
   var checkOutProvider;
+  List addressList = [];
+
+  @override
+  initState() {
+    super.initState();
+    this._getDefaultAddress();
+    eventBus.on<CheckOutEvent>().listen((event) {
+      this._getDefaultAddress();
+    });
+  }
+
+  _getDefaultAddress() async{
+    List userInfo = await UserServices.getUserInfo();
+    var tempJson = {
+      'uid': userInfo[0]['_id'],
+      'salt': userInfo[0]['salt'],
+    };
+    var sign = SignServices.getSign(tempJson);
+    var api = "${Config.domain}api/oneAddressList?uid=${userInfo[0]['_id']}&sign=${sign}";
+
+    var response = await Dio().get(api);
+    setState(() {
+      this.addressList = List.from(response.data['result']);
+    });
+  }
 
   Widget _checkOutItem(item) {
     return Container(
@@ -66,6 +98,30 @@ class _CheckOutPageState extends State<CheckOutPage> {
       ),
     );
   }
+
+  // 下单
+  doOrder() async{
+    List userInfo = await UserServices.getUserInfo();
+    var tempJson = {
+      'uid': userInfo[0]['_id'],
+      'salt': userInfo[0]['salt'],
+      'address': this.addressList[0]['address'],
+      'phone': this.addressList[0]['phone'],
+      'name': this.addressList[0]['name'],
+      'all_price': this.addressList[0][''],
+      'products': json.encode(this.checkOutProvider.checkOutList)
+    };
+    var sign = SignServices.getSign(tempJson);
+    var api = "${Config.domain}api/oneAddressList?uid=${userInfo[0]['_id']}&sign=${sign}";
+
+    var response = await Dio().get(api);
+    setState(() {
+      this.addressList = List.from(response.data['result']);
+    });
+  }
+
+  // 获取总价格
+
   @override
   Widget build(BuildContext context) {
     ScreenAdapter.init(context);
@@ -84,7 +140,23 @@ class _CheckOutPageState extends State<CheckOutPage> {
                 ),
                 child: Column(
                   children: <Widget>[
-                    ListTile(
+                    this.addressList.length>0?ListTile(
+                      title: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(height: ScreenAdapter.height(10)),
+                          Text('${this.addressList[0]['name']} ${this.addressList[0]['phone']}'),
+                          SizedBox(height: ScreenAdapter.height(10)),
+                          Text('${this.addressList[0]['address']}'),
+                          SizedBox(height: ScreenAdapter.height(10)),
+                        ],
+                      ),
+                      trailing: Icon(Icons.navigate_next),
+                      onTap: (){
+                        Navigator.pushNamed(context, '/addressList');
+                      },
+                    ): ListTile(
                       leading: Icon(Icons.add_location),
                       title: Center(
                         child: Text('请添加收获地址'),
@@ -92,23 +164,6 @@ class _CheckOutPageState extends State<CheckOutPage> {
                       trailing: Icon(Icons.navigate_next),
                       onTap: (){
                         Navigator.pushNamed(context, '/addressAdd');
-                      },
-                    ),
-                    ListTile(
-                      title: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(height: ScreenAdapter.height(10)),
-                          Text('张三 15201681234'),
-                          SizedBox(height: ScreenAdapter.height(10)),
-                          Text('北京市海定区西二旗'),
-                          SizedBox(height: ScreenAdapter.height(10)),
-                        ],
-                      ),
-                      trailing: Icon(Icons.navigate_next),
-                      onTap: (){
-                        Navigator.pushNamed(context, '/addressList');
                       },
                     ),
                   ],

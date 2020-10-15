@@ -5,15 +5,23 @@ class JdText extends StatelessWidget {
   String text;
   bool password;
   bool focus;
+  int maxLines;
+  final double height;
   Object onChange;
-  JdText({Key key, this.text = '输入内容', this.password = false, this.focus = false, this.onChange = null}): super(key: key);
+  TextEditingController controller;
+  JdText({Key key, this.text = '输入内容', this.password = false, this.focus = false, this.onChange = null, this.controller = null, this.maxLines= 1,this.height = 68}): super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: TextField(
+        controller: controller,
+        maxLines: this.maxLines,
         obscureText: this.password,
         autofocus: this.focus,
+        style: TextStyle(
+          color: Colors.black
+        ),
         decoration: InputDecoration(
           hintText: '${this.text}',
           hintStyle: TextStyle(
@@ -27,7 +35,7 @@ class JdText extends StatelessWidget {
         ),
         onChanged: this.onChange,
       ),
-      height: ScreenAdapter.height(68),
+      height: ScreenAdapter.height(this.height),
       decoration: BoxDecoration(
 //          color: Color.fromRGBO(233, 233, 233, 0.8),
 //          borderRadius: BorderRadius.circular(30)

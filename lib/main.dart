@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => Cart()),
-        ChangeNotifierProvider(create: (_) => CheckOut(),)
+        ChangeNotifierProvider(create: (_) => CheckOut()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

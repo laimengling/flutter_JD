@@ -36,6 +36,7 @@ class _CartPageState extends State<CartPage>{
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
         );
+        Navigator.pushNamed(context, '/login');
       }
     } else {
       Fluttertoast.showToast(

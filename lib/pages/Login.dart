@@ -48,7 +48,6 @@ class _LoginPageState extends State<LoginPage> {
       });
       print(response.data);
       if(response.data['success']){
-        print(response.data);
         // 保存用户信息
         Storage.setString('userInfo', json.encode(response.data['userinfo']));
         Navigator.pop(context);
