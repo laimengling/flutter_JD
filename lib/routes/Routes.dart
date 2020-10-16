@@ -32,7 +32,7 @@ final routes = {
   '/addressEdit':(context, { arguments }) => AddressEdit(arguments: arguments),
   '/pay': (context) => PayPage(),
   '/order': (context) => Order(),
-  '/orderInfo': (context) => OrderInfo()
+  '/orderInfo': (context, { arguments }) => OrderInfo(arguments: arguments)
   /*
   '/product': (context) => ProductPage(),
   '/productInfo': (context, { arguments }) => ProductInfoPage(arguments: arguments),
