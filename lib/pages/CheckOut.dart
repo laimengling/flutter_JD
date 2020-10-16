@@ -106,42 +106,51 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
   // 下单
   doOrder() async{
-    List userInfo = await UserServices.getUserInfo();
-    var tempJson = {
-      'uid': userInfo[0]['_id'],
-      'salt': userInfo[0]['salt'],
-      'address': this.addressList[0]['address'],
-      'phone': this.addressList[0]['phone'],
-      'name': this.addressList[0]['name'],
-      'all_price': this.allPrice,
-      'products': json.encode(this.checkOutProvider.checkOutList)
-    };
-    var sign = SignServices.getSign(tempJson);
-    var api = "${Config.domain}api/doOrder";
+    if(this.addressList.length > 0) {
+      List userInfo = await UserServices.getUserInfo();
+      var tempJson = {
+        'uid': userInfo[0]['_id'],
+        'salt': userInfo[0]['salt'],
+        'address': this.addressList[0]['address'],
+        'phone': this.addressList[0]['phone'],
+        'name': this.addressList[0]['name'],
+        'all_price': this.allPrice,
+        'products': json.encode(this.checkOutProvider.checkOutList)
+      };
+      var sign = SignServices.getSign(tempJson);
+      var api = "${Config.domain}api/doOrder";
 
-    var response = await Dio().post(api, data: {
-      'uid': userInfo[0]['_id'],
-      'sign': sign,
-      'address': this.addressList[0]['address'],
-      'phone': this.addressList[0]['phone'],
-      'name': this.addressList[0]['name'],
-      'all_price': this.allPrice.toStringAsFixed(1),
-      'products': json.encode(this.checkOutProvider.checkOutList)
-    });
-    if(response.data['success']) {
-      // 删除购物车选中的商品数据
-      await CheckOutServices.removeSelectedItem();
-      // 更新购物车数据
-      cartProvider.updateCartList();
-      // 跳转到支付页面
-      Navigator.pushNamed(context, '/pay');
+      var response = await Dio().post(api, data: {
+        'uid': userInfo[0]['_id'],
+        'sign': sign,
+        'address': this.addressList[0]['address'],
+        'phone': this.addressList[0]['phone'],
+        'name': this.addressList[0]['name'],
+        'all_price': this.allPrice.toStringAsFixed(1),
+        'products': json.encode(this.checkOutProvider.checkOutList)
+      });
+      if(response.data['success']) {
+        // 删除购物车选中的商品数据
+        await CheckOutServices.removeSelectedItem();
+        // 更新购物车数据
+        cartProvider.updateCartList();
+        // 跳转到支付页面
+        Navigator.pushNamed(context, '/pay');
+      } else {
+        Fluttertoast.showToast(
+          msg: '${response.data["message"]}',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+        );
+      }
     } else {
       Fluttertoast.showToast(
-        msg: '${response.data["message"]}',
+        msg: '请先选择地址，后下单喏',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
       );
     }
+
   }
 
   // 获取总价格

@@ -107,6 +107,9 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
           ListTile(
             leading: Icon(Icons.assignment, color: Colors.red),
             title: Text('全部订单'),
+            onTap: () {
+              Navigator.pushNamed(context, '/order');
+            },
           ),
           Divider(height: 1),
           ListTile(

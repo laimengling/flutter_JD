@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_jdshop/pages/Address/AddressEdit.dart';
+import 'package:flutter_jdshop/pages/Order.dart';
+import 'package:flutter_jdshop/pages/OrderInfo.dart';
 import 'package:flutter_jdshop/pages/Pay.dart';
 import '../pages/Address/AddressAdd.dart';
 import '../pages/Address/AddressList.dart';
@@ -27,8 +29,10 @@ final routes = {
   '/checkOut':(context) => CheckOutPage(),
   '/addressList':(context) => AddressList(),
   '/addressAdd': (context) => AddressAdd(),
+  '/addressEdit':(context, { arguments }) => AddressEdit(arguments: arguments),
   '/pay': (context) => PayPage(),
-  '/addressEdit':(context, { arguments }) => AddressEdit(arguments: arguments)
+  '/order': (context) => Order(),
+  '/orderInfo': (context) => OrderInfo()
   /*
   '/product': (context) => ProductPage(),
   '/productInfo': (context, { arguments }) => ProductInfoPage(arguments: arguments),
