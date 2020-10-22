@@ -44,12 +44,22 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
+    /*针对打包新加的*/
+    signingConfigs {
+        release {
+            keyAlias '仿京东商城'
+            keyPassword '123456'
+            storeFile file('key/jdshop.jks')
+            storePassword '123456'
+        }
+    }
 
+    /*针对打包新加的 signingConfig signingConfigs.debug修改*/
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
     }
 }
